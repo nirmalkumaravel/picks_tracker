@@ -1,7 +1,6 @@
 // src/components/Pending.tsx
 import { useEffect, useMemo, useState } from "react";
 import type { Ticket } from "../lib/models";
-
 type Props = {
   tickets: Ticket[];
   updateTicket: (id: string, patch: Partial<Ticket>) => Promise<any> | void;

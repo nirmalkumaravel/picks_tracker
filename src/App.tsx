@@ -6,8 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { Ticket } from "./lib/models";
 import { v4 as uuidv4 } from "uuid";
 import { addDays, fmtISO } from "./lib/group";
-import { withComputed } from "./lib/storage";
-import { normalizeLegs } from "./lib/storage"; // <-- add this line
+import { withComputed, normalizeLegs } from "./lib/storage";
 import {
   listTickets as apiList,
   createTicket as apiCreate,
@@ -34,25 +33,26 @@ export default function App() {
         setLoading(true);
         setLoadError(null);
         const rows = await apiList({ start: range.start, end: range.end });
-        // Ensure each record conforms to Ticket and has computed fields
+
         const normalized: Ticket[] = rows.map((r: any) =>
-        withComputed({
-          id: r.ticket_id ?? r.id,
-          event_dt: r.event_dt ?? r.eventDate,
-          sport: r.sport,
-          market: r.market,
-          title: r.title ?? "",
-          ticket_type: r.ticket_type ?? r.ticketType ?? "Single",
-          stake: Number(r.stake || 0),
-          decimal_odds: Number(r.decimal_odds || r.odds || 1),
-          status: r.status,
-          payout: Number(r.payout || 0),
-          notes: r.notes ?? "",
-          legs: normalizeLegs(r.legs),            // <-- HERE
-          created_at: r.created_at,
-          updated_at: r.updated_at,
-        })
-      );
+          withComputed({
+            id: r.ticket_id ?? r.id,
+            event_dt: r.event_dt ?? r.eventDate,
+            sport: r.sport,
+            market: r.market,
+            title: r.title ?? "",
+            ticket_type: r.ticket_type ?? r.ticketType ?? "Single",
+            stake: Number(r.stake || 0),
+            decimal_odds: Number(r.decimal_odds || r.odds || 1),
+            status: r.status,
+            payout: Number(r.payout || 0),
+            notes: r.notes ?? "",
+            legs: normalizeLegs(r.legs),
+            created_at: r.created_at,
+            updated_at: r.updated_at,
+          })
+        );
+
         if (isAlive) setTickets(normalized);
       } catch (e: any) {
         console.error(e);
@@ -61,9 +61,7 @@ export default function App() {
         if (isAlive) setLoading(false);
       }
     })();
-    return () => {
-      isAlive = false;
-    };
+    return () => { isAlive = false; };
   }, [range.start, range.end]);
 
   // ---- Global axis domains for charts ----
@@ -78,8 +76,7 @@ export default function App() {
       ...tickets.map((t) => Math.max(Number(t.stake) || 0, Number(t.payout) || 0))
     );
     const nets = tickets.map((t) => Number(t.payout || 0) - Number(t.stake || 0));
-    const netMin = Math.min(...nets),
-      netMax = Math.max(...nets);
+    const netMin = Math.min(...nets), netMax = Math.max(...nets);
     return {
       net: niceDomain(netMin, netMax),
       money: niceDomain(0, moneyMax),
@@ -108,7 +105,7 @@ export default function App() {
         status: candidate.status,
         payout: Number(candidate.payout || 0),
         notes: candidate.notes ?? "",
-        legs: candidate.legs ?? [],
+        legs: normalizeLegs(candidate.legs),
       });
     } catch (e) {
       console.error(e);
@@ -120,6 +117,7 @@ export default function App() {
 
   const updateTicket = async (id: string, patch: Partial<Ticket>) => {
     const before = tickets;
+
     // optimistic update
     setTickets((prev) =>
       prev.map((t) => (t.id === id ? withComputed({ ...t, ...patch }) : t))
@@ -128,29 +126,22 @@ export default function App() {
     try {
       // send only fields that may change
       const allowed = [
-        "event_dt",
-        "sport",
-        "market",
-        "title",
-        "ticket_type",
-        "stake",
-        "decimal_odds",
-        "status",
-        "payout",
-        "notes",
-        "legs",
+        "event_dt", "sport", "market", "title", "ticket_type",
+        "stake", "decimal_odds", "status", "payout", "notes", "legs",
       ] as const;
+
       const payload: Record<string, any> = {};
       for (const k of allowed) {
-        if (k in patch) {
-          // map UI -> API keys if needed (kept same names as Lambda handler)
-          payload[k] = (patch as any)[k];
-        }
+        if (k in patch) payload[k] = (patch as any)[k];
       }
+      // if legs present, normalize
+      if ("legs" in payload) payload.legs = normalizeLegs(payload.legs);
+
       await apiUpdate(id, payload);
     } catch (e) {
       console.error(e);
       alert("Update failed; reloading.");
+
       // reload current range from server
       try {
         const rows = await apiList({ start: range.start, end: range.end });
@@ -167,10 +158,10 @@ export default function App() {
             status: r.status,
             payout: Number(r.payout || 0),
             notes: r.notes ?? "",
-            legs: Array.isArray(r.legs) ? r.legs : [],
+            legs: normalizeLegs(r.legs),
             created_at: r.created_at,
             updated_at: r.updated_at,
-          } as Ticket)
+          })
         );
         setTickets(normalized);
       } catch {
@@ -180,7 +171,6 @@ export default function App() {
     }
   };
 
-  // optional: expose delete for Data tab
   const deleteTicket = async (id: string) => {
     const prev = tickets;
     setTickets((t) => t.filter((x) => x.id !== id));
@@ -193,7 +183,6 @@ export default function App() {
     }
   };
 
-  // ---- Render ----
   return (
     <ErrorBoundary>
       <div className="shell">
@@ -231,15 +220,11 @@ export default function App() {
           updateTicket={updateTicket}
           setTickets={setTickets}
           globalDomains={globalDomains}
-          // if your Tabs component accepts these, pass them; else it can use setTickets:
-          // @ts-expect-error optional props depending on your Tabs signature
-          deleteTicket={deleteTicket}
-          // @ts-expect-error optional props depending on your Tabs signature
-          range={range}
-          // @ts-expect-error optional props depending on your Tabs signature
-          setRange={setRange}
-          // @ts-expect-error optional props depending on your Tabs signature
-          loading={loading}
+          // If Tabs needs these, extend Tabs' prop types and re-add:
+          // deleteTicket={deleteTicket}
+          // range={range}
+          // setRange={setRange}
+          // loading={loading}
         />
       </div>
     </ErrorBoundary>

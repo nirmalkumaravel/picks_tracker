@@ -97,7 +97,7 @@ body{
 .theme-switcher .pill.active{outline: 2px solid var(--accent)}
 
 .tabs.tabs-real{position:relative; display:grid; grid-template-columns: repeat(4,1fr); gap:10px; margin:18px 0 14px; background: var(--card); border:1px solid var(--bd); border-radius:14px; padding:6px;}
-.tab-pill{display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-radius:10px; cursor:pointer; background: var(--tab-bg); color: var(--tab-ink); border:1px solid var(--tab-bd); transition: transform .12s ease, box-shadow .2s ease, background .2s ease;}
+.tab-pill{display:inline; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-radius:10px; cursor:pointer; background: var(--tab-bg); color: var(--tab-ink); border:1px solid var(--tab-bd); transition: transform .12s ease, box-shadow .2s ease, background .2s ease;}
 .tab-pill:hover{ transform: translateY(-1px); }
 .tab-pill.active{ box-shadow: 0 10px 24px rgba(2,6,23,.12) }
 .tab-underline{position:absolute; bottom:6px; left:6px; width:calc(25% - 12px); height:3px; background: linear-gradient(90deg, var(--grad1), var(--grad2), var(--grad3), var(--grad4)); border-radius:999px; transition: transform .20s ease;}
