@@ -9,13 +9,12 @@ const BASE_HEADERS: Record<string,string> = {
   "Content-Type": "application/json",
   "x-user-id": "demo-user" // replace with Cognito 'sub' later
 };
-
-// ---- Types (match your Ticket shape) ----
+import type { Leg } from "./models";
 export type TicketPayload = {
   ticket_id: string;
-  event_dt: string;            // "YYYY-MM-DD"
-  sport: string;               // NBA, NFL, etc.
-  market: string;              // ML, Total, Spread, Alternate, Other
+  event_dt: string;
+  sport: string;
+  market: string;
   title?: string;
   ticket_type: "Single" | "Multi";
   stake: number;
@@ -23,7 +22,7 @@ export type TicketPayload = {
   status: "Pending" | "Win" | "Loss" | "Push";
   payout: number;
   notes?: string;
-  legs?: Array<{ idx: number; sport?: string; leg_name: string; leg_result?: string }>;
+  legs?: Leg[];      // <-- use the strong Leg type
 };
 
 export async function listTickets(params: {

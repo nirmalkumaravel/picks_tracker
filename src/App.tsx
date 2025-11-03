@@ -4,9 +4,10 @@ import Topbar from "./components/Topbar";
 import Tabs from "./components/Tabs";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Ticket } from "./lib/models";
-import { withComputed } from "./lib/storage"; // keep this: it enriches Ticket (net, etc.)
 import { v4 as uuidv4 } from "uuid";
 import { addDays, fmtISO } from "./lib/group";
+import { withComputed } from "./lib/storage";
+import { normalizeLegs } from "./lib/storage"; // <-- add this line
 import {
   listTickets as apiList,
   createTicket as apiCreate,
@@ -35,24 +36,23 @@ export default function App() {
         const rows = await apiList({ start: range.start, end: range.end });
         // Ensure each record conforms to Ticket and has computed fields
         const normalized: Ticket[] = rows.map((r: any) =>
-          withComputed({
-            // backend keys -> UI model keys
-            id: r.ticket_id ?? r.id,
-            event_dt: r.event_dt ?? r.eventDate,
-            sport: r.sport,
-            market: r.market,
-            title: r.title ?? "",
-            ticket_type: r.ticket_type ?? r.ticketType ?? "Single",
-            stake: Number(r.stake || 0),
-            decimal_odds: Number(r.decimal_odds || r.odds || 1),
-            status: r.status,
-            payout: Number(r.payout || 0),
-            notes: r.notes ?? "",
-            legs: Array.isArray(r.legs) ? r.legs : [],
-            created_at: r.created_at,
-            updated_at: r.updated_at,
-          } as Ticket)
-        );
+        withComputed({
+          id: r.ticket_id ?? r.id,
+          event_dt: r.event_dt ?? r.eventDate,
+          sport: r.sport,
+          market: r.market,
+          title: r.title ?? "",
+          ticket_type: r.ticket_type ?? r.ticketType ?? "Single",
+          stake: Number(r.stake || 0),
+          decimal_odds: Number(r.decimal_odds || r.odds || 1),
+          status: r.status,
+          payout: Number(r.payout || 0),
+          notes: r.notes ?? "",
+          legs: normalizeLegs(r.legs),            // <-- HERE
+          created_at: r.created_at,
+          updated_at: r.updated_at,
+        })
+      );
         if (isAlive) setTickets(normalized);
       } catch (e: any) {
         console.error(e);

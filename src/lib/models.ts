@@ -1,25 +1,27 @@
 export type Status = "Pending" | "Win" | "Loss" | "Push";
 export type TicketType = "Single" | "Multi";
 export type Market = "ML" | "Total" | "Spread" | "Alternate" | "Other" | "Unlabeled";
-
-export interface Leg {
+// src/lib/models.ts
+export type Leg = {
+  idx: number;
+  sport?: string;
   leg_name: string;
-  leg_odds: number;
-  leg_result: Status;
-}
+  leg_result?: string;
+};
 
-export interface Ticket {
-  id: string;
-  event_dt: string;   // yyyy-MM-dd
-  sport: string;
-  market: Market;
+export type Ticket = {
+  id: string;                    // UI id (maps to ticket_id from API)
+  event_dt: string;              // YYYY-MM-DD
+  sport: string;                 // NBA, NFL, etc.
+  market: string;                // ML, Total, Spread, Alternate, Other
   title?: string;
-  ticket_type: TicketType;
+  ticket_type: "Single" | "Multi";
   stake: number;
   decimal_odds: number;
-  status: Status;
+  status: "Pending" | "Win" | "Loss" | "Push";
   payout: number;
   notes?: string;
-  legs?: Leg[];
-  net?: number;
-}
+  legs: Leg[];
+  created_at?: string;
+  updated_at?: string;
+};
