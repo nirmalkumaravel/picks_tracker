@@ -1,121 +1,242 @@
-import { useEffect, useState } from "react";
-import { Ticket, Leg } from "../lib/models";
+// src/components/Pending.tsx
+import { useEffect, useMemo, useState } from "react";
+import type { Ticket } from "../lib/models";
 
-const SPORTS = ["NBA","NFL","MLB","NHL","NCAA Football","NCAA Basketball","Soccer","Tennis","Cricket","Volleyball","MMA","Boxing","Golf","F1","NASCAR","Rugby","Table Tennis","Esports","Other/Custom"];
-const MARKETS = ["ML","Total","Spread","Alternate","Other"];
-const STATUS = ["Pending","Win","Loss","Push"];
+type Props = {
+  tickets: Ticket[];
+  updateTicket: (id: string, patch: Partial<Ticket>) => Promise<any> | void;
+};
 
-export default function Pending({ tickets, updateTicket }:{
-  tickets:Ticket[]; updateTicket:(id:string, patch:Partial<Ticket>)=>void;
-}){
-  const pending = tickets.filter(t => t.status==="Pending").sort((a,b)=> (a.event_dt||"").localeCompare(b.event_dt||""));
-  const [sel, setSel] = useState(pending[0]?.id || "");
+type EditForm = {
+  status: "Pending" | "Win" | "Loss" | "Push";
+  stake: number;
+  decimal_odds: number;
+  payout: number;
+  notes: string;
+};
 
-  useEffect(()=>{ if(pending.length && !pending.find(p=>p.id===sel)) setSel(pending[0].id); }, [tickets]); // eslint-disable-line
-  if (!pending.length) return <div className="card info">No pending tickets. 🎉</div>;
+export default function Pending({ tickets, updateTicket }: Props) {
+  const pending = useMemo(
+    () => tickets.filter((t) => t.status === "Pending"),
+    [tickets]
+  );
 
-  const t = pending.find(x=>x.id===sel)!;
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const current = useMemo(
+    () => (editingId ? tickets.find((t) => t.id === editingId) ?? null : null),
+    [editingId, tickets]
+  );
+
+  const [form, setForm] = useState<EditForm>({
+    status: "Pending",
+    stake: 0,
+    decimal_odds: 1,
+    payout: 0,
+    notes: "",
+  });
+
+  // Initialize the form when opening the editor or when ticket updates
+  useEffect(() => {
+    if (!current) return;
+    setForm({
+      status: current.status as EditForm["status"],
+      stake: Number(current.stake ?? 0),
+      decimal_odds: Number(current.decimal_odds ?? 1),
+      payout: Number(current.payout ?? 0),
+      notes: current.notes ?? "",
+    });
+  }, [current?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function openEditor(id: string, toStatus?: EditForm["status"]) {
+    setEditingId(id);
+    // status will be set in useEffect; optionally override desired next status
+    if (toStatus && current?.id !== id) {
+      // we can’t set immediately because current isn’t resolved yet;
+      // apply in a microtask
+      Promise.resolve().then(() => {
+        setForm((f) => ({ ...f, status: toStatus }));
+      });
+    } else if (toStatus) {
+      setForm((f) => ({ ...f, status: toStatus }));
+    }
+  }
+
+  function closeEditor() {
+    setEditingId(null);
+  }
+
+  function calcSuggestedPayout(stake: number, dec: number) {
+    // returns total return (not net): stake * decimal_odds
+    const s = Number(stake || 0);
+    const d = Number(dec || 1);
+    return Number((s * d).toFixed(2));
+  }
+
+  async function save() {
+    if (!current) {
+      // guard if the ticket vanished (e.g., list refreshed)
+      setEditingId(null);
+      return;
+    }
+    const { status, stake, decimal_odds, payout, notes } = form;
+
+    // Normalize numbers
+    const patch: Partial<Ticket> = {
+      status,
+      stake: Number(stake || 0),
+      decimal_odds: Number(decimal_odds || 1),
+      payout: Number(payout || 0),
+      notes: notes ?? "",
+    };
+
+    await updateTicket(current.id, patch);
+    setEditingId(null);
+  }
+
   return (
     <div className="card">
-      <label>Choose a ticket</label>
-      <select value={sel} onChange={e=>setSel(e.target.value)}>
-        {pending.map(p => (
-          <option key={p.id} value={p.id}>
-            #{p.id.slice(0,6)} • {p.event_dt} • {p.ticket_type} • {p.sport} • {p.title || ""}
-          </option>
-        ))}
-      </select>
+      <h3 style={{ marginBottom: 12 }}>Pending Items</h3>
 
-      <TicketEditor ticket={t} onChange={(patch)=>updateTicket(t.id, patch)} />
+      {!pending.length && <div className="muted">Nothing pending right now.</div>}
+
+      <div className="table">
+        <div className="thead">
+          <div>Date</div>
+          <div>Title</div>
+          <div>Sport</div>
+          <div>Market</div>
+          <div>Stake</div>
+          <div>Odds</div>
+          <div>Actions</div>
+        </div>
+        {pending.map((t) => (
+          <div className="trow" key={t.id}>
+            <div>{t.event_dt}</div>
+            <div>{t.title}</div>
+            <div>{t.sport}</div>
+            <div>{t.market}</div>
+            <div>${Number(t.stake || 0).toFixed(2)}</div>
+            <div>{Number(t.decimal_odds || 1).toFixed(2)}</div>
+            <div className="row" style={{ gap: 8 }}>
+              <button className="btn soft" onClick={() => openEditor(t.id, "Win")}>
+                Mark Win
+              </button>
+              <button className="btn warn" onClick={() => openEditor(t.id, "Loss")}>
+                Mark Loss
+              </button>
+              <button className="btn" onClick={() => openEditor(t.id)}>
+                Update
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Editor drawer / modal */}
+      {editingId && (
+        <div className="drawer">
+          <div className="drawer-body">
+            {!current ? (
+              <div className="muted">Item no longer available.</div>
+            ) : (
+              <>
+                <div className="row space-between">
+                  <h4>Edit Outcome</h4>
+                  <button className="icon-btn" onClick={closeEditor} aria-label="Close">
+                    ×
+                  </button>
+                </div>
+
+                <div className="grid2">
+                  <div>
+                    <label>Status</label>
+                    <select
+                      value={form.status}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, status: e.target.value as EditForm["status"] }))
+                      }
+                    >
+                      {["Pending", "Win", "Loss", "Push"].map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label>Stake ($)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={Number(form.stake ?? 0)}
+                      onChange={(e) => setForm((f) => ({ ...f, stake: Number(e.target.value) }))}
+                    />
+                  </div>
+
+                  <div>
+                    <label>Decimal Odds</label>
+                    <input
+                      type="number"
+                      min={1}
+                      step="0.01"
+                      value={Number(form.decimal_odds ?? 1)}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, decimal_odds: Number(e.target.value) }))
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label>Payout ($)</label>
+                    <div className="row" style={{ gap: 8 }}>
+                      <input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={Number(form.payout ?? 0)}
+                        onChange={(e) => setForm((f) => ({ ...f, payout: Number(e.target.value) }))}
+                      />
+                      <button
+                        className="btn soft"
+                        type="button"
+                        onClick={() =>
+                          setForm((f) => ({
+                            ...f,
+                            payout: calcSuggestedPayout(f.stake, f.decimal_odds),
+                          }))
+                        }
+                        title="Use stake × decimal odds"
+                      >
+                        Suggest
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label>Notes</label>
+                  <textarea
+                    rows={3}
+                    value={form.notes ?? ""}
+                    onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                  />
+                </div>
+
+                <div className="row" style={{ gap: 8, marginTop: 12 }}>
+                  <button className="btn primary" onClick={save}>
+                    Save
+                  </button>
+                  <button className="btn" onClick={closeEditor}>
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
-}
-
-function TicketEditor({ ticket, onChange }:{ ticket:Ticket; onChange:(patch:Partial<Ticket>)=>void; }){
-  const [stake, setStake] = useState(ticket.stake);
-  const [status, setStatus] = useState(ticket.status);
-  const [sportSel, setSportSel] = useState(SPORTS.includes(ticket.sport) ? ticket.sport : "Other/Custom");
-  const [sportCustom, setSportCustom] = useState(SPORTS.includes(ticket.sport) ? "" : ticket.sport);
-  const [market, setMarket] = useState(ticket.market || "ML");
-  const [notes, setNotes] = useState(ticket.notes || "");
-  const [dec, setDec] = useState(ticket.decimal_odds || 1.0); // for Single or Multi (combined)
-  const [legs, setLegs] = useState<Leg[]>(ticket.legs || []);
-
-  const sport = sportSel==="Other/Custom" ? (sportCustom || "Unlabeled") : sportSel;
-
-  const allResolved = legs.length ? legs.every(l => l.leg_result==="Win" || l.leg_result==="Push") : true;
-  const preview = ticket.ticket_type==="Single"
-    ? (status==="Win" ? stake*dec : status==="Push" ? stake : 0)
-    : (allResolved ? stake*dec : 0); // Multi uses combined decimal in ticket.decimal_odds
-
-  const save = () => {
-    onChange({
-      stake:Number(stake||0),
-      status, sport, market, notes,
-      decimal_odds:Number(dec||1),
-      legs:[...legs]
-    });
-  };
-
-  return (
-    <>
-      <div className="grid2">
-        <div>
-          <label>Stake</label>
-          <input type="number" step="0.01" value={stake} onChange={e=>setStake(Number(e.target.value))} />
-
-          <label>Status</label>
-          <select value={status} onChange={e=>setStatus(e.target.value as any)}>
-            {STATUS.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-
-          <label>Sport</label>
-          <select value={sportSel} onChange={e=>setSportSel(e.target.value)}>
-            {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          {sportSel==="Other/Custom" && <input placeholder="Custom sport…" value={sportCustom} onChange={e=>setSportCustom(e.target.value)} />}
-
-          <label>Category</label>
-          <select value={market} onChange={e=>setMarket(e.target.value as any)}>
-            {MARKETS.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
-        </div>
-
-        <div>
-          <label>{ticket.ticket_type==="Single" ? "Decimal Odds" : "Combined Decimal Odds"}</label>
-          <input type="number" step="0.0001" value={dec} onChange={e=>setDec(Number(e.target.value))} />
-
-          {ticket.ticket_type==="Multi" && (
-            <>
-              <label>Legs</label>
-              <div className="table legs">
-                <div className="thead"><div>Leg Name</div><div>Result</div><div>—</div></div>
-                {legs.map((lg, idx)=>(
-                  <div className="trow" key={idx}>
-                    <div>{lg.leg_name}</div>
-                    <select value={lg.leg_result||"Pending"} onChange={e=>patchLeg(idx,{leg_result:e.target.value as any})}>
-                      {STATUS.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                    <div />
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          <div className="info">Projected Return: <b>${preview.toFixed(2)}</b> • Net: <b>${(preview - Number(stake||0)).toFixed(2)}</b></div>
-        </div>
-      </div>
-
-      <div className="grid3">
-        <button className="primary" onClick={save}>💾 Save Update</button>
-        <button className="ok" onClick={()=>{ setStatus("Win"); setTimeout(save, 0); }}>🏆 Mark Win</button>
-        <button className="danger" onClick={()=>{ setStatus("Loss"); setTimeout(save, 0); }}>❌ Mark Loss</button>
-      </div>
-    </>
-  );
-
-  function patchLeg(i:number, patch:Partial<Leg>){
-    const copy=[...legs]; copy[i] = { ...copy[i], ...patch }; setLegs(copy);
-  }
 }
