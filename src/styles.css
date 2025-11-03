@@ -1,0 +1,205 @@
+/* ===== keep your existing theme tokens + base + topbar + tabs + cards etc. ===== */
+/* (Paste this file over your existing styles.css from my last message) */
+
+/* ===================== THEME TOKENS (same as last message) ===================== */
+/* Light default */
+:root{
+  --bg:#f7f7fb; --ink:#0f172a; --muted:#475569;
+  --card:#ffffff; --glass:#ffffff; --bd:#e2e8f0;
+  --shadow: 0 10px 30px rgba(2,6,23,.08);
+  --grad1:#7C3AED; --grad2:#22C55E; --grad3:#06B6D4; --grad4:#F59E0B;
+  --accent:#6d28d9;
+  --tab-bg: #ffffff; --tab-bd:#e2e8f0; --tab-ink:#0f172a;
+
+  --ctrl-bg:#ffffff; --ctrl-ink:#0f172a; --ctrl-bd:#d1d5db; --ctrl-bg-focus:#ffffff;
+
+  --badge-bg:#eef2ff; --badge-ink:#3730a3;
+  --badge-alt-bg:#ecfeff; --badge-alt-ink:#0e7490;
+
+  --pos:#10b981; --neg:#ef4444;
+}
+
+/* Aurora */
+:root[data-theme="aurora"]{ /* unchanged tokens from previous message */ 
+  --bg:#0f1220; --ink:#E5E7EB; --muted:#A5B4FC;
+  --card: rgba(255,255,255,.08); --glass: rgba(255,255,255,.10); --bd: rgba(255,255,255,.20);
+  --shadow: 0 10px 40px rgba(0,0,0,.25);
+  --grad1:#7C3AED; --grad2:#22C55E; --grad3:#06B6D4; --grad4:#F59E0B;
+  --accent:#9b87f5; --tab-bg: linear-gradient(135deg,rgba(124,58,237,.18),rgba(34,197,94,.20));
+  --tab-bd:rgba(255,255,255,.28); --tab-ink:#fff;
+  --ctrl-bg:rgba(0,0,0,.25); --ctrl-ink:#E5E7EB; --ctrl-bd:rgba(255,255,255,.25); --ctrl-bg-focus:rgba(0,0,0,.18);
+  --badge-bg:rgba(147,197,253,.18); --badge-ink:#e0f2fe;
+  --badge-alt-bg:rgba(34,211,238,.18); --badge-alt-ink:#e0f2fe;
+}
+
+/* Sunset */
+:root[data-theme="sunset"]{ /* unchanged tokens */ 
+  --bg:#1a1022; --ink:#f5f3ff; --muted:#f9a8d4;
+  --card: rgba(255,255,255,.08); --glass: rgba(255,255,255,.10); --bd: rgba(255,255,255,.20);
+  --shadow: 0 10px 40px rgba(0,0,0,.25);
+  --grad1:#F43F5E; --grad2:#FB923C; --grad3:#F59E0B; --grad4:#4ADE80;
+  --accent:#f472b6; --tab-bg: linear-gradient(135deg,rgba(244,63,94,.22),rgba(251,146,60,.22));
+  --tab-bd:rgba(255,255,255,.28); --tab-ink:#fff;
+  --ctrl-bg:rgba(0,0,0,.25); --ctrl-ink:#fff; --ctrl-bd:rgba(255,255,255,.25); --ctrl-bg-focus:rgba(0,0,0,.18);
+  --badge-bg:rgba(244,114,182,.18); --badge-ink:#fff;
+  --badge-alt-bg:rgba(251,191,36,.18); --badge-alt-ink:#fff;
+}
+
+/* Ocean */
+:root[data-theme="ocean"]{ /* unchanged tokens */ 
+  --bg:#071623; --ink:#e5f2ff; --muted:#bae6fd;
+  --card: rgba(255,255,255,.08); --glass: rgba(255,255,255,.10); --bd: rgba(255,255,255,.20);
+  --shadow: 0 10px 40px rgba(0,0,0,.25);
+  --grad1:#06B6D4; --grad2:#3B82F6; --grad3:#22D3EE; --grad4:#22C55E;
+  --accent:#60a5fa; --tab-bg: linear-gradient(135deg,rgba(6,182,212,.22),rgba(59,130,246,.22));
+  --tab-bd:rgba(255,255,255,.28); --tab-ink:#fff;
+  --ctrl-bg:rgba(0,0,0,.25); --ctrl-ink:#e5f2ff; --ctrl-bd:rgba(255,255,255,.25); --ctrl-bg-focus:rgba(0,0,0,.18);
+  --badge-bg:rgba(59,130,246,.18); --badge-ink:#e0f2fe;
+  --badge-alt-bg:rgba(34,197,94,.18); --badge-alt-ink:#e0f2fe;
+}
+
+/* Neon */
+:root[data-theme="neon"]{ /* unchanged tokens */ 
+  --bg:#0a0b0f; --ink:#f1f5f9; --muted:#c7d2fe;
+  --card: rgba(255,255,255,.08); --glass: rgba(255,255,255,.10); --bd: rgba(255,255,255,.20);
+  --shadow: 0 10px 40px rgba(0,0,0,.25);
+  --grad1:#22d3ee; --grad2:#a78bfa; --grad3:#34d399; --grad4:#f59e0b;
+  --accent:#a78bfa; --tab-bg: linear-gradient(135deg,rgba(34,211,238,.22),rgba(167,139,250,.22));
+  --tab-bd:rgba(255,255,255,.28); --tab-ink:#fff;
+  --ctrl-bg:rgba(0,0,0,.25); --ctrl-ink:#f1f5f9; --ctrl-bd:rgba(255,255,255,.25); --ctrl-bg-focus:rgba(0,0,0,.18);
+  --badge-bg:rgba(167,139,250,.18); --badge-ink:#e9d5ff;
+  --badge-alt-bg:rgba(34,211,238,.18); --badge-alt-ink:#cffafe;
+}
+
+/* ===== BASE / TOPBAR / TABS / CARDS / CONTROLS / KPI from previous message (unchanged) ===== */
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--ink);
+  background:
+    radial-gradient(1000px 600px at 10% -20%, rgba(124,58,237,.12), transparent 60%),
+    radial-gradient(800px 600px at 100% 0%, rgba(34,197,94,.10), transparent 50%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 60%),
+    var(--bg);
+  font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+}
+.shell{max-width:1100px;margin:0 auto;padding:18px}
+
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding:14px 16px; border:1px solid var(--bd); border-radius:18px; background: var(--card); box-shadow: var(--shadow); backdrop-filter: blur(6px);}
+.brand{display:flex; gap:10px; align-items:center}
+.logo{width:40px;height:40px; display:grid; place-items:center; color:white; background: conic-gradient(from 0deg, var(--grad1), var(--grad2), var(--grad3), var(--grad4), var(--grad1)); border-radius:12px; border:1px solid var(--bd);}
+.title{font-size:20px; font-weight:800; letter-spacing:.2px}
+.subtitle{color:var(--muted); font-size:12px}
+.theme-switcher{display:flex; gap:8px}
+.theme-switcher .pill{width:36px;height:36px;border-radius:12px; border:1px solid var(--bd); background: var(--glass); color:var(--ink); display:grid; place-items:center; cursor:pointer; transition: transform .12s ease, background .2s ease;}
+.theme-switcher .pill:hover{transform: translateY(-1px)}
+.theme-switcher .pill.active{outline: 2px solid var(--accent)}
+
+.tabs.tabs-real{position:relative; display:grid; grid-template-columns: repeat(4,1fr); gap:10px; margin:18px 0 14px; background: var(--card); border:1px solid var(--bd); border-radius:14px; padding:6px;}
+.tab-pill{display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-radius:10px; cursor:pointer; background: var(--tab-bg); color: var(--tab-ink); border:1px solid var(--tab-bd); transition: transform .12s ease, box-shadow .2s ease, background .2s ease;}
+.tab-pill:hover{ transform: translateY(-1px); }
+.tab-pill.active{ box-shadow: 0 10px 24px rgba(2,6,23,.12) }
+.tab-underline{position:absolute; bottom:6px; left:6px; width:calc(25% - 12px); height:3px; background: linear-gradient(90deg, var(--grad1), var(--grad2), var(--grad3), var(--grad4)); border-radius:999px; transition: transform .20s ease;}
+
+.card{background: var(--card); border: 1px solid var(--bd); border-radius: 18px; padding: 16px; box-shadow: var(--shadow); backdrop-filter: blur(6px); margin-bottom:14px}
+.chart-card{padding-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr; gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr; gap:16px}
+.row{display:flex;align-items:center;gap:10px}
+.space{justify-content:space-between}
+.mt6{margin-top:6px}
+
+label{display:block; font-size:12px; color:var(--muted); margin:6px 0 6px}
+input,select,button{font:inherit}
+input,select{width:100%; padding:11px 12px; border:1px solid var(--ctrl-bd); border-radius:12px; background: var(--ctrl-bg); color: var(--ctrl-ink);}
+input:focus,select:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 4px rgba(109,40,217,.15); background: var(--ctrl-bg-focus);}
+.seg{display:flex;gap:8px}
+.segbtn{border:1px solid var(--ctrl-bd); background:var(--ctrl-bg); border-radius:999px; padding:8px 12px; cursor:pointer; color:var(--ctrl-ink)}
+.segbtn.active{border-color:var(--accent); box-shadow:0 0 0 3px rgba(109,40,217,.12)}
+button.primary{background: linear-gradient(90deg, var(--grad1), var(--grad3)); color:#fff; border:none; padding:12px 16px; border-radius:12px; cursor:pointer; box-shadow: 0 8px 26px rgba(2,6,23,.18); margin-top:25px;}
+button.ok{background: linear-gradient(90deg, #16a34a, #22c55e); color:#fff;border:none;padding:12px 16px;border-radius:12px;cursor:pointer}
+button.danger{background: linear-gradient(90deg, #ef4444, #f97316); color:#fff;border:none;padding:12px 16px;border-radius:12px;cursor:pointer}
+button.ghost{background:var(--ctrl-bg); border:1px solid var(--ctrl-bd); padding:10px 14px;border-radius:12px;cursor:pointer;color:var(--ctrl-ink)}
+.kpirow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px}
+.kpi{display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--glass); border-radius:18px; padding:14px; border:1px solid var(--bd); box-shadow: var(--shadow);}
+.kpi h3{margin:6px 0 0}
+
+/* ======= NEW: Report header banner ======= */
+.report-header{
+  background:
+    linear-gradient(135deg, rgba(124,58,237,.12), rgba(34,197,94,.10)),
+    url("data:image/svg+xml,%3Csvg width='600' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c7d2fe' fill-opacity='.12'%3E%3Ccircle cx='50' cy='50' r='40'/%3E%3Ccircle cx='200' cy='120' r='60'/%3E%3Ccircle cx='420' cy='60' r='50'/%3E%3C/g%3E%3C/svg%3E") right/auto no-repeat,
+    var(--card);
+}
+
+/* ======= NEW: Data header with hero background ======= */
+.data-header{
+  display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px;
+  border:1px dashed var(--bd); border-radius:14px; margin-bottom:12px;
+  background:
+    linear-gradient(135deg, rgba(6,182,212,.10), rgba(124,58,237,.10)),
+    url("data:image/svg+xml,%3Csvg width='800' height='180' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%2399f6e4' stroke-opacity='.15' fill='none' stroke-width='2'%3E%3Cpath d='M0 120 Q 150 60 300 120 T 600 120 T 900 120'/ %3E%3C/g%3E%3C/svg%3E") center/cover no-repeat;
+}
+
+/* ======= NEW: Filters bar ======= */
+.filters-bar{
+  display:grid; grid-template-columns: repeat(6, 1fr); gap:10px; margin-bottom:12px;
+}
+.filters-bar .wide{grid-column: span 2}
+@media (max-width: 860px){
+  .filters-bar{grid-template-columns:1fr 1fr}
+  .filters-bar .wide{grid-column: span 2}
+}
+
+/* ======= NEW: Rich datatable ======= */
+.datatable{display:block; width:100%}
+.datatable .sticky{
+  position:sticky; top:0; z-index:2;
+  background:
+    linear-gradient(90deg, rgba(124,58,237,.12), rgba(6,182,212,.10)),
+    var(--card);
+  border:1px solid var(--bd);
+  border-radius:12px; margin-bottom:8px;
+}
+.datatable .thead, .datatable .trow{
+  display:grid; grid-template-columns: 1.1fr 1.1fr 1fr .9fr .9fr .8fr .8fr .9fr .9fr; gap:8px; align-items:center;
+}
+.datatable .thead>div{ padding:10px 12px; font-weight:700; color:var(--ink) }
+.datatable .trow.fancy{
+  padding:6px 0;
+  transition: background .15s ease, transform .05s ease;
+}
+.datatable .trow.fancy:hover{
+  background: linear-gradient(90deg, rgba(124,58,237,.06), rgba(6,182,212,.06));
+  transform: translateY(-1px);
+}
+.datatable .trow.fancy.odd{ background: rgba(2,6,23,.02) }
+.datatable .right{text-align:right}
+.datatable .mono{font-variant-numeric: tabular-nums}
+.datatable .pos{ color: var(--pos) }
+.datatable .neg{ color: var(--neg) }
+.badge{display:inline-block; padding:6px 10px; border-radius:999px; background:var(--badge-bg); color:var(--badge-ink); font-size:12px}
+.badge.alt{ background:var(--badge-alt-bg); color:var(--badge-alt-ink) }
+.pill{display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px; border:1px solid var(--bd)}
+.pill.ok{background:rgba(16,185,129,.15); color:#065f46; border-color:rgba(16,185,129,.35)}
+.pill.bad{background:rgba(239,68,68,.15); color:#7f1d1d; border-color:rgba(239,68,68,.35)}
+.pill.muted{background:rgba(148,163,184,.15); color:#334155}
+.pill.wait{background:rgba(234,179,8,.15); color:#78350f}
+
+.empty{padding:20px}
+.empty-card{display:flex; gap:10px; align-items:center; justify-content:center; border:1px dashed var(--bd); padding:16px; border-radius:14px}
+.empty-emoji{font-size:22px}
+
+/* ======= Tables used inside Reports (keep) ======= */
+.table{display:grid; gap:8px}
+.table .thead, .table .trow{display:grid; grid-template-columns:repeat(6,1fr); gap:8px}
+.thead{font-size:12px; color:var(--muted)}
+.trow>div, .thead>div{padding:10px 12px; background:var(--ctrl-bg); border:1px solid var(--ctrl-bd); border-radius:12px; color:var(--ctrl-ink)}
+
+/* ======= Responsive tweaks ======= */
+@media (max-width: 860px){
+  .grid2{grid-template-columns: 1fr}
+  .grid3{grid-template-columns: 1fr}
+  .datatable .thead, .datatable .trow{grid-template-columns: repeat(3, 1fr)}
+}

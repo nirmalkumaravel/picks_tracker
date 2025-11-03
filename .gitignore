@@ -1,0 +1,52 @@
+# Node / package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Build output (Vite/React)
+dist/
+build/
+.tmp/
+.temp/
+.cache/
+.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+*.log.*
+debug.log
+
+# Coverage / testing
+coverage/
+.nyc_output/
+
+# Editor junk
+.vscode/
+.idea/
+*.iml
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Optional: local data exports
+*.sqlite
+*.db
+*.db-journal
+*.csv
+*.parquet
+exports/
