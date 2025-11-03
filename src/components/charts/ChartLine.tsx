@@ -1,7 +1,18 @@
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, defs, linearGradient, stop } from "recharts";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend
+} from "recharts";
 import { format, parseISO } from "date-fns";
 
-export default function ChartLine({ data, xKey, yKey, yDomain, color }:{
+export default function ChartLine({
+  data, xKey, yKey, yDomain, color
+}:{
   data:any[]; xKey:string; yKey:string; yDomain:[number,number]; color:string;
 }){
   return (
@@ -14,7 +25,7 @@ export default function ChartLine({ data, xKey, yKey, yDomain, color }:{
               <stop offset="100%" stopColor={color} stopOpacity={0.5}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 6" stroke="#e2e8f0" />
+          <CartesianGrid strokeDasharray="3 6" />
           <XAxis dataKey={xKey} tickFormatter={(d)=>format(parseISO(d), "MMM d")} />
           <YAxis domain={yDomain} />
           <Tooltip formatter={(v)=>Number(v as number).toFixed(2)} labelFormatter={(l)=>format(parseISO(l as string),"PP")} />

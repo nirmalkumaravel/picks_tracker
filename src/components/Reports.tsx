@@ -108,7 +108,15 @@ export default function Reports({
       <div className="card">
         <h4>By Sport — Net & ROI</h4>
         <ChartBarSeries rows={bySport} xKey="label" yKey="net" yDomain={globalDomains.net} color="#7C3AED" />
-        <ChartBarSeries rows={bySport} xKey="label" yKey="roi" yDomain={niceDomain(min(bySport,"roi"), max(bySport,"roi"))} color="#F59E0B" label="ROI %" fmt={(v)=>`${v.toFixed(1)}`} />
+        <ChartBarSeries
+          rows={bySport}
+          xKey="label"
+          yKey="roi"
+          yDomain={niceDomain(min(bySport,"roi"), max(bySport,"roi")) as [number, number]}
+          color="#F59E0B"
+          label="ROI %"
+          fmt={(v)=>`${v.toFixed(1)}`}
+        />
         <h4>Outcomes by Sport</h4>
         <ChartBarStacked rows={outcomesBySport} />
         <Table rows={bySport} columns={[
@@ -121,7 +129,15 @@ export default function Reports({
       <div className="card">
         <h4>By Category — Net & ROI</h4>
         <ChartBarSeries rows={byMarket} xKey="label" yKey="net" yDomain={globalDomains.net} color="#06B6D4" />
-        <ChartBarSeries rows={byMarket} xKey="label" yKey="roi" yDomain={niceDomain(min(byMarket,"roi"), max(byMarket,"roi"))} color="#EF4444" label="ROI %" fmt={(v)=>`${v.toFixed(1)}`} />
+        <ChartBarSeries
+          rows={byMarket}
+          xKey="label"
+          yKey="roi"
+          yDomain={niceDomain(min(byMarket,"roi"), max(byMarket,"roi")) as [number, number]}
+          color="#EF4444"
+          label="ROI %"
+          fmt={(v)=>`${v.toFixed(1)}`}
+        />
         <h4>Outcomes by Category</h4>
         <ChartBarStacked rows={outcomesByMarket} />
         <Table rows={byMarket} columns={[
